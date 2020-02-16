@@ -1,16 +1,16 @@
 from setuptools import setup
 
 setup(
-    name="rearrange",
+    name="reorg",
     version="0.1.0",
     license="MIT",
     author="Michael Hwang",
-    description="Command-line to rearrange documents stored in CLB6 structure to..",
-    packages=["rearrange"],
+    description="Command-line to reorganize documents stored in CLB6 structure to..",
+    packages=["reorg"],
     install_requires=[],
     entry_points={
         "console_scripts": [
-            "rearrange = rearrange.cli:run"
+            "reorg = reorg.cli:run"
             ]
         }
 )
