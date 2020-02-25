@@ -37,6 +37,11 @@ def run():
         print(step)
         dir_curr, dirs_in_curr, files_in_curr = step
 
+        # TODO: I GIVE UP. Make context/concepts always directories because of
+        # the _pages directory OR must check for _pages directory..
+        # TODO: _pages just copy up entire directory as is + links in _index
+        # TODO: _static dir gets merged into one giant static directory?
+
         if cr.is_path_special(dir_curr):
             print("Skipping special directory")
         elif cr.should_create_page(step):
