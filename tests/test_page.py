@@ -57,7 +57,7 @@ def test_group_notes():
             'Another thought': ['Bar bar'], 'Final thought': ['Hello hello']}
 
 def test_when_note_created():
-    created = page.when_note_created("2020-02-13-2000.md")
+    created = page.when_note_created("_2020-02-13-2000.md")
     print(created)
     assert created.year == 2020 and created.month == 2 and created.day == 13
     assert created.hour == 20

@@ -9,10 +9,24 @@ def should_create_page(step):
 def is_name_special(name_to_check):
     return name_to_check[0] == "_"
 
-def is_path_special(dir_to_check):
-    name = os.path.basename(dir_to_check)
-    return is_name_special(name)
+def is_path_special(dir_root, dir_to_check):
+    common = os.path.commonpath([dir_root, dir_to_check])
+    dtc = dir_to_check.replace(common, "")
+    print(os.path.split(dtc))
 
+    while True:
+        # This loop terminates when there's no more in the path to pop off
+        # i.e. ('/', '')
+        (dtc, tail) = os.path.split(dtc)
+        if tail:
+            if is_name_special(tail):
+                # If any part is special then True
+                return True
+        else:
+            break
+    return False
+
+# REVIEW: Death watch - is this func needed?
 def is_leaf_node(step):
     _, dir_names, _ = step
     # All dirs that start with underscore are special

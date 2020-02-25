@@ -30,7 +30,7 @@ def group_notes(grouped_notes, new_note):
 
 
 def when_note_created(name_note):
-    return dt.strptime(name_note.replace(".md", ""), "%Y-%m-%d-%H%M")
+    return dt.strptime(name_note.replace(".md", ""), "_%Y-%m-%d-%H%M")
 
 def get_title_level(line):
     """Determines whether line is a title and returns the level otherwise zero"""

@@ -37,15 +37,33 @@ def run():
         print(step)
         dir_curr, dirs_in_curr, files_in_curr = step
 
-        if cr.is_path_special(dir_curr):
+        if cr.is_path_special(dir_src_root, dir_curr):
             print("Skipping special directory")
         elif cr.should_create_page(step):
             dir_target = cr.whats_target_dir_for_section(dir_curr, dir_src_root,
                     dir_target_root)
 
-            if cr.is_leaf_node(step):
-                dir_target = adjust_target_dir_for_page(dir_target)
+            # Give up on being slick by trying to avoid creating top-level
+            # sectional/group directory. Assume contexts/concepts will most likely
+            # have some directory to be copied anyways, code will be simpler..
 
+            # Handling _pages must be first since it requires that the directory
+            # doesn't already exist
+            # TODO: Inject TOC into index page
+            if "_pages" in dirs_in_curr:
+                src = os.path.join(dir_curr, "_pages")
+                # NOTE: Copying into top-level group directory
+                dest = dir_target
+                shutil.copytree(src, dest)
+
+            # Straight up copy _static
+            # TODO: Should _static dirs be merged in a big global dir?
+            if "_static" in dirs_in_curr:
+                src = os.path.join(dir_curr, "_static")
+                dest = os.path.join(dir_target, "static")
+                shutil.copytree(src, dest)
+
+            # Handle index and notes
             if not os.path.exists(dir_target):
                 os.mkdir(dir_target)
 
