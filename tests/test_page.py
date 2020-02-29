@@ -95,6 +95,31 @@ More thoughts on some thought.
 Another paragraph here.
 """
 
+SOME_NOTE_WITH_BLOCK = """
+## Some thought
+
+Some thought was made.
+
+### Sub sub thought
+
+Here is where sub sub thought done.
+
+## Another thought
+
+Another thought was made.
+
+## Some thought
+
+More thoughts on some thought.
+
+```
+# This is a comment
+$ some code
+```
+
+Another paragraph here.
+"""
+
 def test_find_title_levels_distribution():
     text_split = SOME_NOTE.split("\n")
     counter = page.find_title_levels_distribution(text_split)
@@ -118,3 +143,45 @@ def test_parse_note():
             'Another thought': [('Another thought was made.',
                 created)]
             }
+
+    result = page.parse_note(SOME_NOTE_WITH_BLOCK, created)
+    print(result)
+    assert result == {'Some thought': [('Some thought was made.\n\n#### Sub sub thought\n\nHere is where sub sub thought done.\n\n\nMore thoughts on some thought.\n\n```\n# This is a comment\n$ some code\n```\n\nAnother paragraph here.',
+        created)],
+        'Another thought': [('Another thought was made.', created)]}
+
+
+NOTE_WITH_BLOCKS = """
+## Some notes
+
+Blah blah
+
+```
+# Some comment
+print("YO")
+```
+
+Foo foo
+"""
+
+def test_identify_code_blocks():
+    result = page.identify_code_blocks(NOTE_WITH_BLOCKS.split("\n"))
+    assert result == [(5,8)]
+
+def test_strip_chunks():
+    result = page.strip_chunks(NOTE_WITH_BLOCKS.split("\n"), [(5,8)])
+    print(result)
+    assert result == ['', '## Some notes', '', 'Blah blah', '', '', 'Foo foo', '']
+
+    result = page.strip_chunks(list(range(0, 10)), [(0, 1), (8, 9)])
+    print(result)
+    assert result == [2, 3, 4, 5, 6, 7]
+
+def test_is_in_block():
+    rb = [(5,8), (10,15)]
+    assert False == page.is_in_block(rb, 1)
+    assert all([page.is_in_block(rb, i) for i in range(5, 9)])
+    assert False == page.is_in_block(rb, 9)
+    assert all([page.is_in_block(rb, i) for i in range(10, 16)])
+    assert False == page.is_in_block(rb, 16)
+    assert False == page.is_in_block(rb, 100)

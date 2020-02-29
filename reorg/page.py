@@ -55,30 +55,63 @@ def get_title_level_biggest(title_levels):
     stl = sorted(list(title_levels))
     return stl[0] if stl else 0
 
+def identify_code_blocks(text_split):
+    result = [i for i in range(0, len(text_split)) if "```" in text_split[i]]
+    return list(zip(result[0::2], result[1::2]))
+
+def strip_chunks(text_split, ranges_to_remove):
+    """ranges_to_remove is list of pairs the pairs is the range to remove from
+    text_split inclusive"""
+    result = []
+    pointer = 0
+    for s,e in ranges_to_remove:
+        result += text_split[pointer:s]
+        # Need to add one in order to not include endpoints
+        pointer = e+1
+
+    if pointer != len(text_split):
+        result += text_split[pointer:]
+
+    return result
+
+def is_in_block(ranges_for_blocks, line_num):
+    """True if line_num falls into one of the blocks otherwise False"""
+    for s,e in ranges_for_blocks:
+        if line_num < s:
+            return False
+        elif s <= line_num and line_num <= e:
+            return True
+    return False
+
 
 def parse_note(note_text, created):
     # Split by \n and group sequential text by header "##"
     note_text_split = note_text.split("\n")
-    title_levels = find_title_levels_distribution(note_text_split)
+    ranges_code_block = identify_code_blocks(note_text_split)
+
+    note_no_blocks = strip_chunks(note_text_split, ranges_code_block)
+    title_levels = find_title_levels_distribution(note_no_blocks)
     biggest_level = get_title_level_biggest(title_levels)
 
     store = {}
     last_group = None
 
-    for line in note_text_split:
-        title_level = get_title_level(line)
+    for i in range(0, len(note_text_split)):
+        line = note_text_split[i]
 
-        # TODO: Need to handle when a line looks like a title but its in a code
-        # block
-        if title_level == biggest_level:
-            last_group = line.replace("#"*biggest_level, "").strip()
-            continue
-        elif title_level > 0:
-            # Note groups start at 3 - yes hardcoded
-            line = adjust_title_level(line, 3 + (title_level - biggest_level))
-        else:
-            if not last_group:
-                last_group = "Dot dot dot"
+        if not is_in_block(ranges_code_block, i):
+            # Skip trying to do the title processing when in a code block
+            title_level = get_title_level(line)
+
+            if title_level == biggest_level:
+                last_group = line.replace("#"*biggest_level, "").strip()
+                continue
+            elif title_level > 0:
+                # Note groups start at 3 - yes hardcoded
+                line = adjust_title_level(line, 3 + (title_level - biggest_level))
+
+        if not last_group:
+            last_group = "Dot dot dot"
 
         lines = store.get(last_group, [])
         lines.append(line)
