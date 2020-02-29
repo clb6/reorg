@@ -96,7 +96,7 @@ def parse_note(note_text, created):
 
     return result
 
-def create_page(step):
+def create_page(step, order_latest_first=True):
     dir_curr, dir_names, file_names = step
 
     with open(os.path.join(dir_curr, "_index.md"), "r+") as f:
@@ -104,9 +104,9 @@ def create_page(step):
 
     dir_notes = os.path.join(dir_curr, "_notes")
     grouped_notes = {}
-    # TODO: Make sort order a configurable thing. By default, show latest notes
-    # first.
-    for name_note in reversed(os.listdir(dir_notes)):
+    reversed_maybe = lambda n: reversed(n) if order_latest_first else n
+
+    for name_note in reversed_maybe(sorted(os.listdir(dir_notes))):
         path_note = os.path.join(dir_notes, name_note)
 
         with open(path_note, "r+") as f:

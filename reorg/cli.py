@@ -56,6 +56,9 @@ def run():
                 dest = dir_target
                 shutil.copytree(src, dest)
 
+            # TODO: Need to adjust the "_static" dir in the note and maybe
+            # consolidate all static dirs
+
             # Straight up copy _static
             # TODO: Should _static dirs be merged in a big global dir?
             if "_static" in dirs_in_curr:
@@ -67,7 +70,7 @@ def run():
             if not os.path.exists(dir_target):
                 os.mkdir(dir_target)
 
-            page_text = page.create_page(step)
+            page_text = page.create_page(step, order_latest_first=True)
             page_path = os.path.join(dir_target, page.create_page_name(dir_curr))
 
             with open(page_path, "w+") as f:
